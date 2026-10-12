@@ -12,7 +12,7 @@
 
 ## URL Preview
 
-https://pombal-emprega-cp841aa6c-enzoreizinho12-cmds-projects.vercel.app/
+https://pombal-emprega-git-codex-po-fa288c-enzoreizinho12-cmds-projects.vercel.app/
 
 O deployment verificado ficou Ready e foi classificado como Preview. Cada novo push para `codex/pombalemprega-preview` cria outra prévia. Confira a branch e o ambiente no painel antes de compartilhar a URL.
 
