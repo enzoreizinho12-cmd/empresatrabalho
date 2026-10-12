@@ -1,0 +1,10 @@
+import Link from "next/link";
+export default function Privacy() {
+  return <main className="container-page max-w-3xl py-12 prose"><h1 className="text-4xl font-black mb-6">Política de privacidade</h1><p className="text-slate-600 mb-6">Versão inicial para ambiente de testes. A identificação do controlador e o canal oficial de atendimento precisam ser definidos antes da publicação pública.</p>
+    <h2 className="text-xl font-bold mt-7">Dados tratados</h2><p>O cadastro usa e-mail e senha gerenciados pelo serviço de autenticação. Candidatos podem informar nome, contato, cidade, formação, experiência, habilidades, cursos e disponibilidade. Empresas informam nome, cidade e detalhes das vagas. Candidaturas, denúncias e alterações de etapa ficam registradas.</p>
+    <h2 className="text-xl font-bold mt-7">Finalidade e compartilhamento</h2><p>Os dados profissionais são usados para apresentar vagas e conduzir candidaturas. Uma empresa aprovada vê perfis no banco de talentos somente quando o candidato ativa essa opção. O telefone do candidato não é mostrado na busca. Ao candidatar-se, o candidato compartilha seu perfil profissional com a empresa responsável pela vaga.</p>
+    <h2 className="text-xl font-bold mt-7">Compatibilidade</h2><p>A pontuação considera cargo desejado, cidade, habilidades, experiência, escolaridade, disponibilidade e modalidade. Nome, foto e outros atributos pessoais não participam da classificação. A pontuação não impede candidaturas.</p>
+    <h2 className="text-xl font-bold mt-7">Controle e solicitações</h2><p>Você pode corrigir seu perfil, controlar a visibilidade profissional e registrar uma solicitação de exclusão em <Link href="/conta" className="text-blue-700 underline">Minha conta</Link>. A conclusão da solicitação depende de análise das obrigações aplicáveis de conservação.</p>
+    <h2 className="text-xl font-bold mt-7">Segurança</h2><p>O acesso aos dados usa autenticação e políticas de acesso no banco de dados. Não solicitamos CPF no cadastro inicial.</p>
+  </main>;
+}

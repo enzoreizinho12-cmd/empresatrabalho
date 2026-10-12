@@ -1,0 +1,24 @@
+import Link from "next/link";
+import { closeJob, markNotification } from "@/app/actions";
+import { requireRole } from "@/lib/auth";
+import { DashboardNav } from "@/components/dashboard-nav";
+import { Feedback } from "@/components/feedback";
+
+export default async function CompanyDashboard({ searchParams }: { searchParams: Promise<{ erro?: string; aviso?: string }> }) {
+  const { supabase, user } = await requireRole("company");
+  const { data: company } = await supabase.from("companies").select("*").eq("owner_id", user.id).maybeSingle();
+  if (!company) return <main className="container-page py-10"><h1 className="text-3xl font-bold">Cadastre sua empresa</h1><p className="text-slate-600 mt-2 mb-6">Após a análise do cadastro, você poderá publicar vagas.</p><Link href="/empresa/perfil" className="btn btn-green">Criar perfil empresarial</Link></main>;
+  const [{ data: jobs }, { data: notifications }] = await Promise.all([
+    supabase.from("jobs").select("id,title,status,created_at,applications(id,stage)").eq("company_id", company.id).order("created_at", { ascending: false }),
+    supabase.from("notifications").select("id,title,body,read_at,created_at").eq("user_id", user.id).order("created_at", { ascending: false }).limit(5),
+  ]);
+  const applications = jobs?.flatMap(job => job.applications ?? []) ?? [];
+  const active = jobs?.filter(job => job.status === "active").length ?? 0;
+  const feedback = await searchParams;
+  return <main className="container-page py-8 sm:py-12 mobile-bottom"><div className="grid sm:grid-cols-[220px_1fr] gap-7"><DashboardNav role="company"/><div><p className="text-emerald-700 font-bold">Painel da empresa</p><h1 className="text-3xl font-black mt-1">Olá, {company.name}! 👋</h1><Feedback {...feedback}/>{company.status === "pending" && <p className="notice mt-5">Cadastro em análise. A publicação de vagas será liberada após aprovação.</p>}{company.status === "blocked" && <p className="error mt-5">Empresa bloqueada. Entre em contato com a administração.</p>}
+    <div className="card p-7 bg-emerald-700 text-white mt-6"><h2 className="text-2xl font-bold">Quem você precisa contratar hoje?</h2><p className="text-emerald-50 mt-2">Descreva a oportunidade para receber candidaturas organizadas.</p>{company.status === "approved" && <Link href="/empresa/nova-vaga" className="btn bg-white text-emerald-800 mt-5">+ Publicar nova vaga</Link>}</div>
+    <section className="mt-8"><div className="flex justify-between items-center mb-3"><h2 className="text-xl font-bold">Notificações</h2><Link href="/empresa/candidaturas" className="text-emerald-700 font-semibold">Ver candidaturas →</Link></div>{notifications?.length ? <div className="grid gap-3">{notifications.map(item => <article key={item.id} className={`card p-4 ${item.read_at ? "opacity-70" : "border-emerald-300"}`}><div className="flex justify-between gap-3"><strong>{item.title}</strong><time className="text-xs text-slate-500">{new Date(item.created_at).toLocaleDateString("pt-BR")}</time></div><p className="text-sm text-slate-600 mt-2">{item.body}</p>{!item.read_at && <form action={markNotification} className="mt-3"><input type="hidden" name="notification_id" value={item.id}/><button className="text-sm text-emerald-700 font-semibold">Marcar como lida</button></form>}</article>)}</div> : <p className="text-slate-600">Nenhuma notificação recente.</p>}</section>
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6">{[[active,"Vagas ativas"],[applications.length,"Candidaturas"],[applications.filter(a => a.stage === "entrevista" || a.stage === "agendada").length,"Entrevistas"],[applications.filter(a => a.stage === "contratado").length,"Contratações"]].map(([n,label]) => <div key={label} className="card p-5"><p className="text-3xl font-black text-emerald-700">{n}</p><p className="text-sm text-slate-600 mt-1">{label}</p></div>)}</div>
+    <div className="flex justify-between items-center mt-10 mb-4"><h2 className="text-2xl font-bold">Suas vagas</h2><Link href="/empresa/candidaturas" className="text-emerald-700 font-bold">Ver candidaturas →</Link></div>{jobs?.length ? <div className="grid gap-4">{jobs.map(job => <div className="card p-6" key={job.id}><div className="flex justify-between"><h3 className="font-bold text-lg">{job.title}</h3><span className="text-sm text-emerald-700">{job.status === "active" ? "Ativa" : job.status}</span></div><p className="text-slate-600 mt-2">{job.applications?.length ?? 0} candidatura(s)</p><div className="flex gap-4 mt-3"><Link href={`/vagas/${job.id}`} className="text-emerald-700 font-bold">Ver anúncio →</Link>{job.status === "active" && <form action={closeJob}><input type="hidden" name="job_id" value={job.id}/><button className="text-slate-600">Encerrar vaga</button></form>}</div></div>)}</div> : <p className="card p-6 text-slate-600">Nenhuma vaga publicada.</p>}
+  </div></div></main>;
+}

@@ -1,0 +1,67 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: "Geist";
+  src: url("/fonts/geist-latin.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+:root { color-scheme: light; }
+html { scroll-behavior: smooth; }
+body { background: #f8fafc; color: #15243b; font-family: "Geist", "Segoe UI Variable", "Segoe UI", Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+button, input, select, textarea { font: inherit; }
+.container-page { max-width: 1160px; margin: 0 auto; padding-inline: 1.25rem; }
+.card { background: white; border: 1px solid #e5eaf1; border-radius: 1.25rem; box-shadow: 0 8px 32px #1830520a; }
+.field { width: 100%; border: 1px solid #ccd7e4; border-radius: .75rem; padding: .7rem .85rem; background: white; }
+.field:focus { outline: 2px solid #2563eb; outline-offset: 1px; }
+.label { display: block; font-size: .87rem; font-weight: 700; margin-bottom: .35rem; }
+.btn { display: inline-flex; align-items: center; justify-content: center; border-radius: .75rem; padding: .7rem 1.05rem; font-weight: 700; cursor: pointer; text-align: center; }
+.btn-blue { background: #1755c8; color: white; }
+.btn-green { background: #087b5b; color: white; }
+.btn-outline { background: white; border: 1px solid #cbd5e1; color: #1b3458; }
+.notice { border-radius: .75rem; padding: .75rem 1rem; background: #ecfdf5; color: #065f46; }
+.error { border-radius: .75rem; padding: .75rem 1rem; background: #fef2f2; color: #991b1b; }
+.site-header { position: sticky; top: 0; z-index: 60; height: 60px; background: #fff; border-bottom: 1px solid #e7edf8; box-shadow: 0 3px 15px #0922560a; }
+.site-header-inner { display: flex; align-items: center; justify-content: space-between; gap: 22px; height: 100%; max-width: 1200px; }
+.site-brand { display: inline-flex; flex: none; align-items: center; gap: 6px; color: #0d3c9e; }
+.site-brand-symbol { width: 47px; height: 42px; }
+.site-brand-wordmark { display: flex; flex-direction: column; line-height: 1; }
+.site-brand-wordmark strong { font-size: 23px; letter-spacing: -.055em; white-space: nowrap; font-weight: 800; }
+.site-brand-wordmark strong span { color: #007c50; }
+.site-brand-wordmark small { color: #566b96; font-size: 7px; font-weight: 800; letter-spacing: .24em; margin-top: 5px; white-space: nowrap; }
+.site-nav { display: flex; align-items: center; justify-content: center; gap: clamp(10px,1.65vw,25px); color: #111f46; white-space: nowrap; font-size: 13px; font-weight: 650; }
+.site-nav a:hover,.site-footer a:hover { color: #0755f9; }
+.site-header-actions { display: flex; align-items: center; gap: 9px; flex: none; }
+.site-location { position: relative; color: #273b65; font-size: 12px; font-weight: 600; }
+.site-location summary { list-style: none; display: flex; align-items: center; gap: 6px; padding: 11px 12px; border-radius: 10px; background: #f1f5fa; cursor: pointer; white-space: nowrap; }
+.site-location summary::-webkit-details-marker { display: none; }
+.site-location summary svg:first-child { color: #0755f9; }
+.site-location form { position: absolute; right: 0; top: 43px; width: 225px; padding: 15px; border: 1px solid #d9e4f5; border-radius: 12px; background: white; box-shadow: 0 16px 35px #0b245331; display: grid; gap: 8px; }
+.site-location form label { font-size: 11px; font-weight: 800; }
+.site-location form input { border: 1px solid #cdd9e9; border-radius: 7px; padding: 7px 9px; outline-color: #0755f9; }
+.site-location form button { border-radius: 7px; background: #0755f9; color: white; padding: 8px; cursor: pointer; font-weight: 800; }
+.site-login,.site-signup { display: inline-flex; align-items: center; justify-content: center; gap: 5px; min-height: 35px; padding: 0 16px; border-radius: 8px; font-weight: 700; font-size: 12px; white-space: nowrap; }
+.site-login { border: 1px solid #9cb9fa; color: #0755f9; }
+.site-signup { color: #fff; background: #0755f9; box-shadow: 0 5px 12px #0755f92a; }
+.site-signup:hover { background: #0342c9; }
+.site-mobile-menu { display: none; }
+.site-footer { background: #fff; color: #283b61; border-top: 1px solid #e5ebf5; }
+.site-footer-top { display: grid; grid-template-columns: 1.3fr .7fr 1fr; gap: 55px; padding-top: 43px; padding-bottom: 40px; max-width: 1200px; }
+.site-footer-top > div:first-child > p { font-size: 12px; color: #70809a; margin-top: 12px; }
+.site-footer-top nav { display: grid; align-content: start; gap: 8px; font-size: 12px; }
+.site-footer-top nav strong,.site-footer-help > strong { font-size: 12px; color: #0a275b; margin-bottom: 5px; }
+.site-footer-help details { border-bottom: 1px solid #edf1f7; padding: 7px 0; font-size: 12px; }
+.site-footer-help summary { cursor: pointer; font-weight: 700; }
+.site-footer-help p { color: #6a7994; line-height: 1.5; margin-top: 5px; }
+.site-contact-button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; border-radius: 8px; background: #008f5a; color: white; margin-top: 13px; padding: 10px 14px; font-weight: 700; font-size: 12px; }
+.site-contact-button:hover { background: #007349; color: white !important; }
+.site-footer-bottom { max-width: 1200px; border-top: 1px solid #e7edf5; padding-top: 16px; padding-bottom: 18px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; color: #73839e; font-size: 11px; }
+.site-footer-bottom strong { color: #0d438d; font-weight: 750; }
+@media (max-width: 1080px) { .site-header-inner { gap: 12px; } .site-brand-symbol { width: 40px; } .site-brand-wordmark strong { font-size: 20px; } .site-nav { gap: 10px; font-size: 11px; } .site-location summary { padding-inline: 8px; font-size: 10px; } .site-login,.site-signup { padding-inline: 11px; } }
+@media (max-width: 850px) { .site-nav { display: none; } .site-mobile-menu { display: block; position: relative; } .site-mobile-menu summary { list-style: none; display: grid; place-items: center; width: 35px; height: 35px; border: 1px solid #d8e3f6; border-radius: 8px; color: #0755f9; cursor: pointer; } .site-mobile-menu summary::-webkit-details-marker { display: none; } .site-mobile-menu nav { position: absolute; right: 0; top: 43px; display: grid; gap: 0; min-width: 180px; background: #fff; border: 1px solid #dce5f5; border-radius: 11px; box-shadow: 0 18px 32px #0e285338; overflow: hidden; } .site-mobile-menu nav a { padding: 10px 14px; font-size: 12px; font-weight: 800; } .site-mobile-menu nav a:hover { background: #eff5ff; } }
+@media (max-width: 620px) { .site-header { height: 62px; } .site-header-inner { gap: 8px; } .site-location { display: none; } .site-brand-symbol { width: 35px; } .site-brand-wordmark strong { font-size: 18px; } .site-brand-wordmark small { font-size: 5.8px; } .site-login,.site-signup { padding-inline: 8px; font-size: 10px; min-height: 32px; } .site-signup svg { display: none; } .site-mobile-menu summary { width: 32px; height: 32px; } .site-footer-top { grid-template-columns: 1fr 1fr; gap: 27px; } .site-footer-top > div:first-child { grid-column: 1 / -1; } .site-footer-bottom { display: grid; } }
+@media (max-width: 380px) { .site-brand-symbol { width: 28px; } .site-brand-wordmark strong { font-size: 15px; } .site-brand-wordmark small { display: none; } .site-login { display: none; } }
+@media (max-width: 640px) { .mobile-bottom { padding-bottom: 5rem; } }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
