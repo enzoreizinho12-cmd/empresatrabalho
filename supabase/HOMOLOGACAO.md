@@ -1,30 +1,23 @@
-# Homologação autenticada (staging)
+# Homologação autenticada — PombalEmprega
 
-O teste `npm run test:homologation` usa a chave pública configurada em `.env.local` e cinco contas de teste já confirmadas. Não cria usuários nem envia e-mails. Ele recusa qualquer URL cujo ref não seja o staging esperado `vctcnxvoajszeqfffcah` e exige confirmação explícita do mesmo ref em `.env.homologation`.
+## Projeto confirmado
 
-## Preparação única no staging
+O usuário confirmou que o projeto Supabase `nzaquzpwvbyvhorfibrt` é o staging isolado. `.env.local` ainda aponta para `vctcnxvoajszeqfffcah`; a suíte usa somente a URL/chave pública e contas de teste em `.env.homologation`, nunca essas credenciais de produção.
 
-1. Confirme no painel Supabase que o projeto `vctcnxvoajszeqfffcah` é exclusivo de homologação. Não rode o teste em produção.
-2. Crie manualmente no Auth cinco usuários fictícios com e-mail confirmado e metadados `{"role":"candidate"}` para João e Maria, `{"role":"company"}` para as duas empresas e conta de administrador exclusiva. Use endereços de domínio reservado, por exemplo `@homologacao.invalid`, e não selecione envio de convite.
-3. O trigger cria João e Maria como candidatos e as empresas como empresas. Para o admin, execute no SQL Editor do staging, depois de confirmar o ref:
+## Proteção contra gravações acidentais
 
-   ```sql
-   update public.account_roles ar
-   set role = 'admin', suspended = false
-   from auth.users u
-   where ar.user_id = u.id
-     and lower(u.email) = lower('admin@homologacao.invalid');
-   ```
+A suíte verifica o ref fixado em `scripts/homologation.test.ts`, exige `POMBALEMPREGA_CONFIRM_STAGING` com o mesmo ref e também exige uma confirmação transitória no processo:
 
-4. Copie `.env.homologation.example` para `.env.homologation` e informe e-mails/senhas dessas contas. O arquivo é ignorado pelo Git. Nunca use a chave secreta; o teste usa somente `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
-5. Execute `npm run test:homologation`.
+`POMBALEMPREGA_ALLOW_STAGING_WRITES=I_CONFIRM_STAGING_ISOLATED`
 
-## O que o teste verifica
+A confirmação transitória não está salva nos arquivos `.env`. O usuário confirmou o ambiente e a suíte autenticada foi executada. Criou/atualizou perfis, empresas, vagas e candidaturas fictícias. Esses registros permanecem no staging; não foram apagados.
 
-Com sessões autenticadas distintas, cria/atualiza perfis fictícios, registra duas empresas e duas vagas, aprova as empresas com a conta admin de teste, exercita consentimento e ranking de compatibilidade, candidaturas e duplicidade, identidade da sessão, isolamento de perfis/vagas/candidaturas/notificações, atualização de etapa e encerramento de vaga.
+## Resultado da execução
 
-Os registros de homologação permanecem no staging para auditoria. Cada execução cria vagas com título único; não apaga contas nem dados. Se algum pré-requisito ou controle falhar, o teste falha e informa a verificação correspondente.
+`npm run test:homologation`: **8/8 aprovados** depois de aplicar as migrations 002 e 003 no staging. A suíte cobriu compatibilidade/consentimento, duas empresas, candidaturas por RPC, duplicidade, identidade, notificações, etapas, suspensão de contas, escopo admin e isolamento RLS.
 
-## Bloqueio administrativo atual
+As migrations `202610120002_active_owner_update_policies.sql` e `202610120003_account_role_suspension_privilege.sql` foram aplicadas manualmente no staging. O teste confirmou que perfis e empresas não aceitam updates enquanto a conta está suspensa e que os valores permanecem inalterados. Produção não foi modificada. A suíte não valida atualização Realtime entre navegadores, email, push ou PWA em aparelhos reais.
 
-A conta Supabase conectada ao navegador não tem acesso ao projeto. Para rodar o teste, autentique o painel com a conta proprietária ou conceda a essa conta acesso ao projeto e ao SQL Editor. A chave secreta que foi exposta deve ser substituída e revogada pelo proprietário no painel; este teste não a consome.
+## Contas e privacidade
+
+As contas usadas são as cinco contas fictícias descritas nos nomes de variáveis `PE_TEST_*` do arquivo `.env.homologation`. Nunca exiba senha, chave ou token em logs/relatórios. Não copie dados pessoais reais para staging.

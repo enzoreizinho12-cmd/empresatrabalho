@@ -5,9 +5,11 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { requireRole, requireUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { getSiteOrigin } from "@/lib/site-url";
 
 const value = (form: FormData, key: string) => String(form.get(key) ?? "").trim();
 const list = (form: FormData, key: string) => value(form, key).split(",").map((item) => item.trim()).filter(Boolean);
+const safeJobReturn = (path: string) => /^\/vagas(?:\/[0-9a-f-]{36})?$/i.test(path) ? path : "";
 function fail(path: string, message: string): never {
   redirect(`${path}?erro=${encodeURIComponent(message)}`);
 }
@@ -17,6 +19,7 @@ const signupPath = (role: SignupRole, message?: string) => `/cadastro?tipo=${rol
 const digits = (input: string) => input.replace(/\D/g, "");
 
 async function createAccount(form: FormData, role: SignupRole) {
+  const next = safeJobReturn(value(form, "next"));
   const common = {
     email: value(form, "email").toLowerCase(), password: value(form, "password"),
     confirm_password: value(form, "confirm_password"), phone: digits(value(form, "phone")),
@@ -36,7 +39,7 @@ async function createAccount(form: FormData, role: SignupRole) {
   const parsed = schema.safeParse({ ...common, ...details });
   if (!parsed.success) {
     const message = parsed.error.issues[0]?.message ?? "Revise os dados informados.";
-    redirect(signupPath(role, message));
+    redirect(`${signupPath(role, message)}${next ? `&next=${encodeURIComponent(next)}` : ""}`);
   }
 
   const profile = Object.fromEntries(Object.entries(parsed.data).filter(([key]) => !["email", "password", "confirm_password", "terms"].includes(key)));
@@ -46,14 +49,14 @@ async function createAccount(form: FormData, role: SignupRole) {
     password: parsed.data.password,
     options: {
       data: { role, ...(role === "candidate" ? { candidate_profile: profile } : { company_profile: profile }) },
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"}/auth/callback`,
+      emailRedirectTo: `${getSiteOrigin()}/auth/callback${next ? `?next=${encodeURIComponent(next)}` : ""}`,
     },
   });
   if (error) {
     const alreadyExists = error.code === "user_already_exists" || /already registered|already exists/i.test(error.message);
-    redirect(signupPath(role, alreadyExists ? "Este e-mail já possui uma conta. Entre ou recupere sua senha." : "Não foi possível criar a conta agora. Confira os dados e tente novamente."));
+    redirect(`${signupPath(role, alreadyExists ? "Este e-mail já possui uma conta. Entre ou recupere sua senha." : "Não foi possível criar a conta agora. Confira os dados e tente novamente.")}${next ? `&next=${encodeURIComponent(next)}` : ""}`);
   }
-  redirect("/entrar?aviso=Cadastro iniciado. Confira seu e-mail para confirmar a conta e continuar.");
+  redirect(`/entrar?aviso=${encodeURIComponent("Cadastro iniciado. Confira seu e-mail para confirmar a conta e continuar.")}${next ? `&next=${encodeURIComponent(next)}` : ""}`);
 }
 
 export async function signUpCandidate(form: FormData) {
@@ -65,10 +68,11 @@ export async function signUpCompany(form: FormData) {
 }
 
 export async function signIn(form: FormData) {
+  const next = safeJobReturn(value(form, "next"));
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email: value(form, "email"), password: value(form, "password") });
   if (error) fail("/entrar", "Não foi possível entrar. Confira e-mail, senha e confirmação da conta.");
-  redirect("/painel");
+  redirect(next || "/painel");
 }
 
 export async function signOut() {
@@ -81,7 +85,7 @@ export async function requestPasswordReset(form: FormData) {
   const email = value(form, "email");
   if (!z.email().safeParse(email).success) fail("/recuperar", "Informe um e-mail válido.");
   const supabase = await createClient();
-  await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"}/auth/callback?next=/nova-senha` });
+  await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${getSiteOrigin()}/auth/callback?next=/nova-senha` });
   redirect("/recuperar?aviso=Se existir uma conta, enviaremos um link de recuperação.");
 }
 
@@ -90,7 +94,7 @@ export async function updatePassword(form: FormData) {
   if (password.length < 8) fail("/nova-senha", "Use pelo menos 8 caracteres.");
   const supabase = await createClient();
   const { error } = await supabase.auth.updateUser({ password });
-  if (error) fail("/nova-senha", error.message);
+  if (error) fail("/nova-senha", "Não foi possível atualizar a senha. Solicite um novo link de recuperação e tente novamente.");
   redirect("/painel");
 }
 
@@ -109,7 +113,7 @@ export async function saveCandidate(form: FormData) {
     first_job: form.get("first_job") === "on", visible_in_directory: form.get("visible_in_directory") === "on",
     updated_at: new Date().toISOString(),
   });
-  if (error) fail("/candidato/perfil", error.message);
+  if (error) fail("/candidato/perfil", "Não foi possível salvar o currículo. Tente novamente.");
   revalidatePath("/candidato");
   redirect("/candidato");
 }
@@ -133,7 +137,7 @@ export async function saveCompany(form: FormData) {
   const { error } = existing
     ? await supabase.from("companies").update(payload).eq("id", existing.id)
     : await supabase.from("companies").insert({ owner_id: user.id, ...payload });
-  if (error) fail("/empresa/perfil", error.message);
+  if (error) fail("/empresa/perfil", "Não foi possível salvar o perfil da empresa. Tente novamente.");
   const { error: metadataError } = await supabase.auth.updateUser({ data: { company_profile: profileSchema.data } });
   if (metadataError) fail("/empresa/perfil", "A empresa foi salva, mas não foi possível atualizar os dados privados. Tente novamente.");
   revalidatePath("/empresa");
@@ -160,7 +164,7 @@ export async function publishJob(form: FormData) {
     availability: list(form, "availability"), benefits: list(form, "benefits"),
     deadline: value(form, "deadline") || null, first_job_friendly: form.get("first_job_friendly") === "on",
   });
-  if (error) fail("/empresa/nova-vaga", error.message);
+  if (error) fail("/empresa/nova-vaga", "Não foi possível publicar a vaga. Confira os dados e tente novamente.");
   revalidatePath("/vagas"); revalidatePath("/empresa");
   redirect("/empresa?aviso=Vaga publicada.");
 }
@@ -169,7 +173,7 @@ export async function applyJob(form: FormData) {
   const { supabase } = await requireRole("candidate");
   const jobId = value(form, "job_id");
   const { error } = await supabase.rpc("apply_for_job", { target_job: jobId });
-  if (error) fail(`/vagas/${jobId}`, error.message);
+  if (error) fail(`/vagas/${jobId}`, "Não foi possível enviar a candidatura. Confira se a vaga ainda está aberta e tente novamente.");
   revalidatePath("/candidato/candidaturas");
   redirect("/candidato/candidaturas?aviso=Candidatura enviada.");
 }
@@ -178,7 +182,7 @@ export async function saveJob(form: FormData) {
   const { supabase, user } = await requireRole("candidate");
   const jobId = value(form, "job_id");
   const { error } = await supabase.from("saved_jobs").upsert({ user_id: user.id, job_id: jobId });
-  if (error) fail(`/vagas/${jobId}`, error.message);
+  if (error) fail(`/vagas/${jobId}`, "Não foi possível salvar a vaga. Tente novamente.");
   redirect(`/vagas/${jobId}?aviso=Vaga salva.`);
 }
 
@@ -193,7 +197,7 @@ export async function closeJob(form: FormData) {
   const { data: company } = await supabase.from("companies").select("id,status").eq("owner_id", user.id).single();
   if (!company || company.status !== "approved") fail("/empresa", "Empresa não autorizada.");
   const { error } = await supabase.from("jobs").update({ status: "closed" }).eq("id", value(form, "job_id")).eq("company_id", company.id);
-  if (error) fail("/empresa", error.message);
+  if (error) fail("/empresa", "Não foi possível encerrar a vaga. Tente novamente.");
   revalidatePath("/empresa"); revalidatePath("/vagas");
 }
 
@@ -202,7 +206,7 @@ export async function reportJob(form: FormData) {
   const jobId = value(form, "job_id"); const reason = value(form, "reason");
   if (reason.length < 10) fail(`/vagas/${jobId}`, "Explique a denúncia em pelo menos 10 caracteres.");
   const { error } = await supabase.from("reports").insert({ reporter_id: user.id, job_id: jobId, reason });
-  if (error) fail(`/vagas/${jobId}`, error.message);
+  if (error) fail(`/vagas/${jobId}`, "Não foi possível registrar a denúncia. Tente novamente.");
   redirect(`/vagas/${jobId}?aviso=Denúncia recebida.`);
 }
 
@@ -212,14 +216,14 @@ export async function moveApplication(form: FormData) {
   const allowed = ["visualizada", "analise", "entrevista", "agendada", "aprovada", "contratado", "nao_selecionado", "encerrada"];
   if (!allowed.includes(stage)) fail("/empresa/candidaturas", "Etapa inválida.");
   const { error } = await supabase.rpc("move_application", { target_application: value(form, "application_id"), next_stage: stage });
-  if (error) fail("/empresa/candidaturas", error.message);
+  if (error) fail("/empresa/candidaturas", "Não foi possível atualizar a etapa da candidatura. Tente novamente.");
   revalidatePath("/empresa/candidaturas");
 }
 
 export async function withdrawApplication(form: FormData) {
   const { supabase } = await requireRole("candidate");
   const { error } = await supabase.rpc("move_application", { target_application: value(form, "application_id"), next_stage: "retirada" });
-  if (error) fail("/candidato/candidaturas", error.message);
+  if (error) fail("/candidato/candidaturas", "Não foi possível retirar a candidatura. Tente novamente.");
   revalidatePath("/candidato/candidaturas");
 }
 
@@ -228,7 +232,7 @@ export async function approveCompany(form: FormData) {
   const id = value(form, "company_id"); const status = value(form, "status");
   if (!["approved", "blocked"].includes(status)) fail("/admin", "Estado inválido.");
   const { error } = await supabase.from("companies").update({ status }).eq("id", id);
-  if (error) fail("/admin", error.message);
+  if (error) fail("/admin", "Não foi possível atualizar a empresa. Tente novamente.");
   await supabase.from("admin_audit").insert({ actor_id: user.id, action: `company_${status}`, target_id: id });
   revalidatePath("/admin");
 }
@@ -245,6 +249,6 @@ export async function requestDeletion() {
   const { data: existing } = await supabase.from("deletion_requests").select("id").eq("user_id", user.id).maybeSingle();
   if (existing) redirect("/conta?aviso=Sua solicitação já está registrada.");
   const { error } = await supabase.from("deletion_requests").insert({ user_id: user.id });
-  if (error) fail("/conta", error.message);
+  if (error) fail("/conta", "Não foi possível registrar a solicitação. Tente novamente.");
   redirect("/conta?aviso=Solicitação registrada. A equipe analisará a exclusão dos dados.");
 }

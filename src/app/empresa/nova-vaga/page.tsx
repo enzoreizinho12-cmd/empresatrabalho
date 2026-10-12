@@ -8,7 +8,7 @@ export default async function NewJob({ searchParams }: { searchParams: Promise<{
   const { data: company } = await supabase.from("companies").select("city,status").eq("owner_id", user.id).maybeSingle();
   if (!company || company.status !== "approved") redirect("/empresa");
   const params = await searchParams;
-  return <main className="container-page py-10 mobile-bottom"><div className="grid sm:grid-cols-[220px_1fr] gap-7"><DashboardNav role="company"/><div><p className="text-emerald-700 font-bold">Nova oportunidade</p><h1 className="text-3xl font-black mb-6">Publicar vaga</h1><Feedback erro={params.erro}/><form action={publishJob} className="card p-6 sm:p-8 grid md:grid-cols-2 gap-5">
+  return <main className="container-page py-10 mobile-bottom"><div className="grid md:grid-cols-[220px_minmax(0,1fr)] gap-5 lg:gap-7"><DashboardNav role="company"/><div><p className="text-emerald-700 font-bold">Nova oportunidade</p><h1 className="text-3xl font-black mb-6">Publicar vaga</h1><Feedback erro={params.erro}/><form action={publishJob} className="card p-6 sm:p-8 grid md:grid-cols-2 gap-5">
     <div><label htmlFor="title" className="label">Cargo *</label><input id="title" name="title" required className="field" placeholder="Ex.: Garçom"/></div>
     <div><label htmlFor="openings" className="label">Quantidade de vagas *</label><input id="openings" name="openings" type="number" min={1} defaultValue={1} required className="field"/></div>
     <div className="md:col-span-2"><label htmlFor="description" className="label">Descrição detalhada *</label><textarea id="description" name="description" minLength={20} required rows={6} className="field"/></div>

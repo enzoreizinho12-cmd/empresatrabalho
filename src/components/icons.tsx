@@ -1,7 +1,7 @@
 import type { ReactNode, SVGProps } from "react";
 
 type Props = Omit<SVGProps<SVGSVGElement>, "name"> & { size?: number; strokeWidth?: number };
-type Name = "arrow" | "badge" | "bell" | "briefcase" | "building" | "check" | "circle" | "file" | "graduation" | "pin" | "search" | "shield" | "sparkles" | "target" | "users" | "wand" | "utensils" | "shopping" | "hardhat" | "heart" | "truck" | "settings" | "trophy" | "bookmark" | "chevron" | "chart" | "menu";
+type Name = "arrow" | "badge" | "bell" | "briefcase" | "building" | "check" | "circle" | "file" | "graduation" | "home" | "pin" | "search" | "shield" | "sparkles" | "target" | "users" | "wand" | "utensils" | "shopping" | "hardhat" | "heart" | "truck" | "settings" | "trophy" | "bookmark" | "chevron" | "chart" | "menu";
 
 const paths: Record<Name, ReactNode> = {
   arrow: <><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></>,
@@ -13,6 +13,7 @@ const paths: Record<Name, ReactNode> = {
   circle: <><circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/></>,
   file: <><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h6"/></>,
   graduation: <><path d="m2 9 10-5 10 5-10 5z"/><path d="M6 11v5c4 3 8 3 12 0v-5M22 9v7"/></>,
+  home: <><path d="m3 10 9-7 9 7"/><path d="M5 9v12h14V9M9 21v-7h6v7"/></>,
   pin: <><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0"/><circle cx="12" cy="10" r="2.5"/></>,
   search: <><circle cx="10.7" cy="10.7" r="7.2"/><path d="m16 16 5 5"/></>,
   shield: <><path d="m12 2 8 4v6c0 5-3.4 8.3-8 10-4.6-1.7-8-5-8-10V6z"/><path d="m8.5 12 2.2 2.2 4.8-4.8"/></>,
@@ -46,6 +47,7 @@ export const Check = (props: Props) => <Icon name="check" {...props}/>;
 export const CircleCheck = (props: Props) => <Icon name="circle" {...props}/>;
 export const FileText = (props: Props) => <Icon name="file" {...props}/>;
 export const GraduationCap = (props: Props) => <Icon name="graduation" {...props}/>;
+export const Home = (props: Props) => <Icon name="home" {...props}/>;
 export const MapPin = (props: Props) => <Icon name="pin" {...props}/>;
 export const Search = (props: Props) => <Icon name="search" {...props}/>;
 export const ShieldCheck = (props: Props) => <Icon name="shield" {...props}/>;

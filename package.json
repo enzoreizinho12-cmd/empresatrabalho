@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint src",
     "test": "vitest run src",
-    "test:homologation": "node --env-file=.env.local --env-file=.env.homologation ./node_modules/vitest/vitest.mjs run scripts/homologation.test.ts"
+    "test:homologation": "node ./scripts/run-homologation.mjs",
+    "audit:pwa": "node scripts/audit-pwa.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.6.1",

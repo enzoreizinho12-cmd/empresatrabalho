@@ -43,6 +43,25 @@ Comandos de verificação: `npm test`, `npm run lint`, `npm run build`.
 
 Esta é uma primeira entrega funcional do núcleo. Ainda faltam: experiências, formações e cursos normalizados em tabelas próprias; foto e exportação de currículo em PDF; convites, mensagens e entrevistas em tempo real; notificações push/PWA; disponibilidade temporária com prazo; moderação administrativa de vagas no painel; tratamento administrativo completo de denúncias e solicitações de exclusão; proteção contra spam e limitação de tentativas; testes integrados de RLS com duas empresas e múltiplos candidatos; revisão jurídica final dos textos de privacidade/termos e identificação do responsável. Botões dessas funções ainda não foram exibidos como se estivessem prontas.
 
-Falta aplicar a migration `202610110003_company_match_and_alerts.sql` e validar os fluxos autenticados com contas isoladas de homologação. O Auth do projeto exige confirmação de e-mail e o Docker local não iniciou; não foram criados usuários nem enviados e-mails. **Não houve alteração de dados ou deploy remoto por esta sessão.** A chave secreta compartilhada na conversa não é necessária para a aplicação e deve ser rotacionada no painel do Supabase.
+Os fluxos autenticados foram validados no staging isolado `nzaquzpwvbyvhorfibrt`: 8/8 testes passaram após as migrations de suspensão. Não houve alteração no banco de produção. O deploy Vercel segue bloqueado por ausência de projeto vinculado, limite de armazenamento excedido e verificação de identidade exigida para conectar o escopo GitHub do repositório. A chave secreta compartilhada anteriormente não é usada no frontend; rotacione-a no Supabase.
 
 Referências técnicas: [Next.js App Router](https://nextjs.org/docs/app/getting-started) e [Supabase SSR](https://supabase.com/docs/guides/auth/server-side). Para os direitos do titular, consultar a [ANPD](https://www.gov.br/anpd/pt-br/assuntos/titular-de-dados-1/direito-dos-titulares).
+
+
+## Aplicativo instalável (PWA)
+
+O manifesto em src/app/manifest.ts usa o nome PombalEmprega, idioma pt-BR e abertura standalone. Os ícones são gerados a partir da marca local pelo comando node scripts/generate-pwa-icons.mjs. O service worker só guarda ícones, fontes, imagens públicas e recursos imutáveis de /_next/static/. Páginas, navegações, Server Actions, sessão, perfil, currículo e APIs sempre usam a rede. Offline, uma tela informa que candidatura só é confirmada pelo servidor.
+
+No Android/Chrome, instalar aparece quando o navegador emite beforeinstallprompt. No Safari do iPhone/iPad, aparece um guia para adicionar à Tela de Início; não existe instalação automática pela página. A permissão de notificações não é solicitada. Atualizações do service worker esperam uma ação explícita e a interface pede que formulários alterados sejam salvos antes de recarregar.
+
+Verificação local: npm run audit:pwa valida manifesto, ícones e limites de cache; npm run lint, npm test e npm run build conferem a aplicação. Instalação e offline em dispositivos reais precisam ser verificados no domínio HTTPS de homologação.
+
+## Situação da homologação — 12/10/2026
+
+`.env.local` e `.env.homologation` apontam para projetos diferentes. O projeto `nzaquzpwvbyvhorfibrt` foi confirmado pelo usuário como staging isolado. A suíte verifica esse ref e exige uma confirmação transitória por execução antes de gravar.
+
+As migrations 002 e 003 de proteção contra alterações por contas suspensas foram aplicadas somente no staging e verificadas pelos testes autenticados. Veja `docs/RELATORIO-AUDITORIA.md` para resultados e `docs/STATUS-LANCAMENTO.md` para os bloqueios de deploy.
+
+## Resultado de staging — 12/10/2026
+
+O usuário confirmou `nzaquzpwvbyvhorfibrt` como projeto isolado de homologação. `npm run test:homologation` passou em 8/8 cenários com contas fictícias e somente a chave publicável. Os registros de teste permanecem nesse staging. As migrations 002 e 003 de proteção de contas suspensas foram aplicadas e verificadas no staging. O banco de produção não foi alterado e não houve deploy.

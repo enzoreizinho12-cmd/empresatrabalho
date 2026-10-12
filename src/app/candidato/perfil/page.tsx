@@ -8,7 +8,7 @@ export default async function CandidateProfile({ searchParams }: { searchParams:
   const { supabase, user } = await requireRole("candidate");
   const { data: p } = await supabase.from("candidate_profiles").select("*").eq("user_id", user.id).maybeSingle();
   const params = await searchParams;
-  return <main className="container-page py-8 sm:py-12 mobile-bottom"><div className="grid sm:grid-cols-[220px_1fr] gap-7"><DashboardNav role="candidate"/><div><h1 className="text-3xl font-black mb-2">Meu currículo</h1><p className="text-slate-600 mb-6">Atualize suas informações. Seu telefone não aparece no banco de talentos.</p><Feedback erro={params.erro}/><form action={saveCandidate} className="card p-6 sm:p-8 grid md:grid-cols-2 gap-5">
+  return <main className="container-page py-8 sm:py-12 mobile-bottom"><div className="grid md:grid-cols-[220px_minmax(0,1fr)] gap-5 lg:gap-7"><DashboardNav role="candidate"/><div><h1 className="text-3xl font-black mb-2">Meu currículo</h1><p className="text-slate-600 mb-6">Atualize suas informações. Seu telefone não aparece no banco de talentos.</p><Feedback erro={params.erro}/><form action={saveCandidate} className="card p-6 sm:p-8 grid md:grid-cols-2 gap-5">
     <h2 className="font-bold text-xl md:col-span-2">Dados pessoais</h2>
     <div><label htmlFor="full_name" className="label">Nome completo *</label><input id="full_name" name="full_name" required minLength={2} defaultValue={p?.full_name} className="field"/></div>
     <div><label htmlFor="phone" className="label">WhatsApp (privado)</label><input id="phone" name="phone" type="tel" defaultValue={p?.phone ?? ""} className="field"/></div>

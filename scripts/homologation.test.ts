@@ -2,7 +2,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { calculateMatch, type CandidateMatch, type JobMatch } from "../src/lib/match";
 
-const STAGING_PROJECT_REF = "vctcnxvoajszeqfffcah";
+const STAGING_PROJECT_REF = "nzaquzpwvbyvhorfibrt";
 
 type TestAccount = { client: SupabaseClient; userId: string };
 type Context = {
@@ -124,6 +124,9 @@ async function candidateProfile(account: TestAccount, fullName: string, skills: 
 
 describe.sequential("homologação Supabase PombalEmprega — mutações apenas no staging autorizado", () => {
   beforeAll(async () => {
+    if (process.env.POMBALEMPREGA_ALLOW_STAGING_WRITES !== "I_CONFIRM_STAGING_ISOLATED") {
+      throw new Error("Gravações bloqueadas. Confirme o projeto isolado e defina POMBALEMPREGA_ALLOW_STAGING_WRITES=I_CONFIRM_STAGING_ISOLATED somente nesta execução.");
+    }
     const url = required("NEXT_PUBLIC_SUPABASE_URL");
     const projectRef = new URL(url).hostname.split(".")[0];
     if (projectRef !== STAGING_PROJECT_REF) {
@@ -342,6 +345,56 @@ describe.sequential("homologação Supabase PombalEmprega — mutações apenas 
     const visibleIds = new Set(((allRoles.data ?? []) as Array<{ user_id: string }>).map((row) => row.user_id));
     for (const userId of [joao.userId, maria.userId, companyA.userId, companyB.userId]) {
       expect(visibleIds.has(userId)).toBe(true);
+    }
+  });
+
+  it("bloqueia alterações de perfil e empresa enquanto as contas estão suspensas", async () => {
+    const { admin, maria, companyB, companyBId } = ctx();
+    const { data: profile, error: profileReadError } = await maria.client
+      .from("candidate_profiles").select("full_name").eq("user_id", maria.userId).single();
+    expect(profileReadError).toBeNull();
+    const { data: company, error: companyReadError } = await companyB.client
+      .from("companies").select("description").eq("id", companyBId).single();
+    expect(companyReadError).toBeNull();
+
+    const { error: suspendCandidateError } = await admin.client
+      .from("account_roles").update({ suspended: true }).eq("user_id", maria.userId);
+    expect(suspendCandidateError).toBeNull();
+    try {
+      const attempted = await maria.client.from("candidate_profiles")
+        .update({ full_name: "Alteração não autorizada" }).eq("user_id", maria.userId)
+        .select("user_id").maybeSingle();
+      expect(attempted.data).toBeNull();
+      const unchanged = await maria.client.from("candidate_profiles")
+        .select("full_name").eq("user_id", maria.userId).single();
+      expect(unchanged.data?.full_name).toBe(profile?.full_name);
+    } finally {
+      const { error: restoreRoleError } = await admin.client
+        .from("account_roles").update({ suspended: false }).eq("user_id", maria.userId);
+      if (restoreRoleError) throw restoreRoleError;
+      const { error: restoreProfileError } = await maria.client.from("candidate_profiles")
+        .update({ full_name: profile!.full_name }).eq("user_id", maria.userId);
+      if (restoreProfileError) throw restoreProfileError;
+    }
+
+    const { error: suspendCompanyError } = await admin.client
+      .from("account_roles").update({ suspended: true }).eq("user_id", companyB.userId);
+    expect(suspendCompanyError).toBeNull();
+    try {
+      const attempted = await companyB.client.from("companies")
+        .update({ description: "Alteração não autorizada" }).eq("id", companyBId)
+        .select("id").maybeSingle();
+      expect(attempted.data).toBeNull();
+      const unchanged = await companyB.client.from("companies")
+        .select("description").eq("id", companyBId).single();
+      expect(unchanged.data?.description).toBe(company?.description);
+    } finally {
+      const { error: restoreRoleError } = await admin.client
+        .from("account_roles").update({ suspended: false }).eq("user_id", companyB.userId);
+      if (restoreRoleError) throw restoreRoleError;
+      const { error: restoreCompanyError } = await companyB.client.from("companies")
+        .update({ description: company!.description }).eq("id", companyBId);
+      if (restoreCompanyError) throw restoreCompanyError;
     }
   });
 
