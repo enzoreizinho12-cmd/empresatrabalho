@@ -1,25 +1,25 @@
-# Roteiro de demonstração — 10 a 15 minutos
-
-**Objetivo:** apresentar o fluxo de valor do PombalEmprega sem afirmar que funções ainda não homologadas estão prontas para produção.
+# Roteiro de demonstração — 10 minutos
 
 ## Preparação
 
-- Preferir staging confirmado, com contas fictícias e dados de demonstração.
-- Não entrar em produção para demonstrar e não usar currículo, telefone ou email de pessoa real.
-- Até staging ser confirmado, fazer uma demonstração visual local e dizer que a operação autenticada está em validação.
-- Verificar o estado da rede antes da sessão; offline não confirma candidatura.
+- Use o Preview `codex/pombalemprega-preview` com acesso aprovado e os dados fictícios do Supabase Staging `nzaquzpwvbyvhorfibrt`.
+- Não use currículos, emails, telefones ou candidaturas reais.
+- A conta sem permissão recebe uma tela de solicitação de acesso ao Vercel; peça ao proprietário que aprove antes da sessão.
+- A Production não está pronta para demonstração de dados: `/vagas` informa que Supabase não está configurado.
 
-## Roteiro (12 minutos)
+## Roteiro
 
-1. **Início (1 min):** explicar o problema regional e a proposta de aproximar talentos e empresas.
-2. **Navegação pública (2 min):** mostrar Início, Vagas, Para empresas, Como funciona, Planos e Ajuda; buscar por cargo/cidade.
-3. **Vaga e compatibilidade (2 min):** abrir vaga de teste, explicar os critérios determinísticos e que a pontuação não impede candidatura.
-4. **Candidato (2 min):** apresentar perfil, oportunidades, salvas e acompanhamento de candidaturas usando conta fictícia homologada.
-5. **Empresa (2 min):** mostrar aprovação, criação de vaga e organização de candidaturas, distinguindo fluxo testado do que ainda está pendente.
-6. **Administração e privacidade (1 min):** explicar aprovação de empresa, papéis e controles de acesso.
-7. **PWA (1 min):** apresentar opção instalável e tela offline; instalação em aparelhos reais ainda requer validação se não tiver sido feita.
-8. **Próximo passo (1 min):** propor piloto após homologação, definição de termos e condições comerciais.
+1. Início e proposta local — 1 minuto.
+2. Pesquisa de vagas e filtros — 2 minutos.
+3. Compatibilidade profissional e seus critérios — 1 minuto.
+4. Perfil do candidato, progresso real do currículo e recomendações — 2 minutos.
+5. Cadastro empresarial, aprovação e publicação — 2 minutos.
+6. Etapas de candidatura e notificações internas — 1 minuto.
+7. PWA, limitações e próximos passos — 1 minuto.
 
-## Linguagem para estados não homologados
+## Limites a declarar
 
-Use “implementado no código, em homologação” quando o fluxo não foi exercitado com sessões autenticadas independentes. Use “prévia ilustrativa” em imagens e dados demonstrativos. Não diga que há push, cobrança, SLA, número de vagas ou resultados comerciais sem evidência.
+- As vagas abertas no Preview são registros fictícios de homologação.
+- Compatibilidade é uma recomendação profissional explicável, não decisão automática.
+- Push, exportação PDF, verificação empresarial independente e métricas de visualizações continuam pendentes.
+- Instalação PWA em celulares físicos e produção ainda não foram aprovadas.

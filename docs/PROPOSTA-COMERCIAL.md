@@ -2,43 +2,41 @@
 
 ## Visão do produto
 
-O PombalEmprega é uma plataforma digital voltada a conectar candidatos e empresas de Ribeira do Pombal e região. A proposta de valor é organizar oportunidades locais, candidaturas e etapas de seleção em uma experiência única.
+O PombalEmprega conecta candidatos e empresas de Ribeira do Pombal e região por meio de busca pública, perfis profissionais, publicação de vagas e organização de candidaturas.
 
-## O que a versão atual apresenta
+## Recursos disponíveis
 
-- Busca e consulta pública de vagas.
-- Cadastro de perfis de candidato e empresa com Supabase Auth.
-- Perfil profissional, vagas salvas e candidaturas.
+- Busca pública de oportunidades com cidade, área, modalidade, experiência e tipo de contratação.
+- Cadastro e perfil de candidato e empresa.
+- Currículo digital baseado nas informações fornecidas pelo candidato e indicador real de preenchimento.
+- Compatibilidade profissional calculada por critérios associados à vaga, apresentada como orientação.
+- Vagas salvas, candidaturas e atualização de etapas.
 - Painéis distintos para candidato, empresa e administração.
-- Aprovação administrativa de empresas antes da publicação.
-- Registro e atualização de etapas de candidaturas.
-- Compatibilidade explicada por critérios profissionais cadastrados, sem usar nome, gênero ou idade.
-- Notificações internas, denúncias e solicitação de exclusão de conta.
+- Aprovação de empresa, moderação e notificações internas.
 - Interface adaptável e base PWA instalável.
 
-Os recursos acima existem no código, mas os fluxos autenticados ainda precisam de homologação isolada antes de serem vendidos como operação validada.
+Os fluxos autenticados foram testados em Staging isolado (8/8 testes de homologação). O Preview Vercel está Ready, mas exige aprovação de acesso pela equipe. Production ainda não tem integração Supabase configurada e não deve ser apresentada como ambiente operacional.
 
-## Valor para cada público
+## Benefícios
 
-**Candidatos:** encontram oportunidades próximas, apresentam experiência e acompanham candidaturas.
+**Candidatos:** encontrar oportunidades da região, manter dados profissionais organizados e acompanhar candidaturas.
 
-**Empresas:** organizam vagas e inscrições e podem localizar perfis que consentiram em aparecer no diretório.
+**Empresas:** publicar vagas após aprovação, organizar inscrições e buscar perfis que autorizaram visibilidade.
 
-**Gestão da plataforma:** controla aprovação de empresas e acessa ferramentas administrativas protegidas por papel.
+**Gestão:** moderar empresas e denúncias e acompanhar registros administrativos.
 
-## Modelo comercial
+## Condições e escopo comercial
 
-Preço, planos, limites de vagas, cobrança, suporte e SLA não foram definidos nem validados. Definir essas condições com o cliente antes de emitir proposta financeira. Não anunciar integração de cobrança automática.
+Preços, planos, quantidade de vagas, cobrança, suporte e SLA ainda não foram aprovados. Não anunciar checkout, pagamento ou condições ainda não contratadas.
 
-## Escopo recomendado para piloto
+## Piloto recomendado
 
-1. Configurar domínio e identidade do cliente.
-2. Validar políticas, contas e fluxos em staging.
-3. Definir termos, privacidade, retenção e responsável pelo tratamento de dados.
-4. Conduzir piloto com empresas e candidatos convidados.
-5. Medir vagas publicadas, candidaturas concluídas e tempo de resposta.
-6. Aprovar o lançamento após revisão de segurança e contingência.
+1. Confirmar requisitos legais, responsáveis por dados e política de retenção.
+2. Validar ambiente e acessos no Staging.
+3. Convidar empresas e candidatos com consentimento explícito.
+4. Medir indicadores sem coletar dados além do necessário.
+5. Aprovar Production após revisão de segurança e operação.
 
-## Estado informado ao cliente
+## Limites apresentados ao cliente
 
-A apresentação pode mostrar telas e recursos implementados. Marcar como pendentes a homologação autenticada, confirmação do staging, deploy Preview e validação legal/comercial. Não usar dados pessoais reais em demonstrações.
+Rotação da chave privilegiada anteriormente exposta precisa ser confirmada; a auditoria npm está pendente por falha TLS; PWA precisa de teste em aparelhos reais; Preview requer aprovação Vercel; Production ainda mostra Supabase não configurado.
